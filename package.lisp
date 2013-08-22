@@ -1,14 +1,15 @@
 ;;;; package.lisp
 (defpackage #:cl-web-dev
   (:use #:cl #:parenscript)
-  (:import-from #:hunchentoot #:define-easy-handler #:stop)
+  (:import-from #:hunchentoot #:define-easy-handler #:stop
+		#:session-start #:session-value #:delete-session-value #:remove-session)
   (:import-from #:cl-who #:with-html-output-to-string #:with-html-output #:htm #:fmt #:str)
   (:export
    ;; general
    #:with-gensyms #:aif #:awhen #:with-overwrite #:to-file
    
    ;; hunchentoot interaction
-   #:define-handler #:easy-start #:stop
+   #:define-handler #:easy-start #:stop #:session-start #:session-value #:delete-session-value #:remove-session
 
    ;; cl-who interaction
    #:html-str #:html #:scripts #:styles #:htm #:fmt #:str

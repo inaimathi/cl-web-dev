@@ -63,7 +63,7 @@ Takes a file-name and a string. Writes the string to the named file.
 
 ## Hunchentoot-related
 
-There are really only three things I ever do with Hunchentoot. Define handlers, define a static directory and start the server. Very occasionally, I also stop the server. `cl-web-dev` re-exports `stop` and defines the following to help with the rest
+There are really only four things I ever do with Hunchentoot. Define handlers, define a static directory, poke at `session` and start the server. Very occasionally, I also stop the server. `cl-web-dev` re-exports `stop`, `session-start`, `session-value`, `delete-session-value` and `remove-session`, and defines the following to help with the rest
 
 #### easy-start
 
