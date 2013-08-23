@@ -79,6 +79,10 @@ A thin wrapper over `define-easy-handler`. It assigns the handlers' `uri` based 
 
 A shortcut providing reasonable defaults (and a shorter name) for `with-html-output-to-string`.
 
+#### html-prologue
+
+As `html-str`, but for `(with-html-output-to-string (*standard-output* nil :prologue t) ...)`. This is the one you want to use at the top-level of your html generators because it generates a `!DOCTYPE` for you.
+
 #### html
 
 Same as `html-str`, but for `with-html-output`.
@@ -106,6 +110,10 @@ Takes a string and tries to parse it into a JSON object.
 #### fn
 
 Shorthand for the anonymous function of zero arguments.
+
+#### log
+
+Shorthand for `(chain console (log ...))`. A related symbol is `*debugging?*`; if it's set to `nil`, a call to `log` will expand into nothing instead of the logging statement.
 
 #### $
 
@@ -136,6 +144,15 @@ will return `[[0 3] [1 2] [2 1]]`
 #### $grep
 
 Interface to the jQuery `$.grep`. Takes a body rather than a function just like `$map`.
+
+#### $get
+
+Interface to the `$.get` function. Takes a `uri`, an object of parameters and a `body`. There are four bound symbols in body:
+
+- `data`, which refers to the raw return from the handler (doesn't seem to work in all browsers)
+- `status` the HTTP response code
+- `jqXHR`, the jquery response JSON object
+- `res`, a parsed JSON object of the response text when possible
 
 #### $post
 

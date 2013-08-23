@@ -33,7 +33,7 @@
 (defun easy-start (port &optional static-dir)
   (let ((server (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port port))))
     (when static-dir
-      (push (hunchentoot:create-folder-dispatcher-and-handler "/static/" (concatenate 'string static-dir "/"))
+      (push (hunchentoot:create-folder-dispatcher-and-handler "/static/" static-dir)
 	    hunchentoot:*dispatch-table*))
     server))
 
@@ -43,6 +43,11 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; HTML-related 
+(defmacro html-prologue (&body body)
+  "Shortcut for with-html-output-to-string."
+  `(with-html-output-to-string (*standard-output* nil :prologue t)
+     ,@body))
+
 (defmacro html-str (&body body)
   "Shortcut for with-html-output-to-string."
   `(with-html-output-to-string (*standard-output*)
@@ -67,7 +72,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Parenscript-related
-;;;;;;;;;;;;;;;;;;;; JS basics
+;;;;;;;;;;;;;;;;;;;; JS basic
+(defparameter *debugging?* t)
+
+(defpsmacro log (&body body)
+  (when *debugging?*
+    `(chain console (log ,@body))))
+
 (defpsmacro obj->string (thing)
   `(chain -j-s-o-n (stringify ,thing)))
 
@@ -94,6 +105,13 @@
 
 (defpsmacro $grep (lst &body body)
   `(chain j-query (grep ,lst (lambda (elem i) ,@body))))
+
+(defpsmacro $get (uri arg-plist &body body)
+  `(chain j-query 
+	  (get ,uri (create ,@arg-plist)
+		(lambda (data status jqXHR)
+		  (let ((res (string->obj (@ jqXHR response-text))))
+		    ,@body)))))
 
 (defpsmacro $post (uri arg-plist &body body)
   `(chain j-query 

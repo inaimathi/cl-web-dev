@@ -12,11 +12,11 @@
    #:define-handler #:easy-start #:stop #:session-start #:session-value #:delete-session-value #:remove-session
 
    ;; cl-who interaction
-   #:html-str #:html #:scripts #:styles #:htm #:fmt #:str
+   #:html #:html-str #:html-prologue #:scripts #:styles #:htm #:fmt #:str
 
    ;; parenscript interaction (the cl-web-dev includer will still need parenscript)
-   #:obj->string #:string->obj #:fn
+   #:obj->string #:string->obj #:fn #:log #:*debugging?*
    #:$ #:$int #:$float #:$click #:$right-click
    #:doc-ready #:$map #:$grep #:$highlight 
-   #:$post #:$droppable #:$draggable))
+   #:$get #:$post #:$droppable #:$draggable))
 
