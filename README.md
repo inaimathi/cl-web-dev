@@ -55,6 +55,10 @@ Basic macro that provides a particular series of default values to `with-open-fi
 
 Takes a `stream`, a `filename` and a `body`. Executes `body` with `stream` outputting to `filename`.
 
+#### with-append
+
+As `with-overwrite`, but if the specified file already exists, it appends instead of overwriting.
+
 #### to-file
 
 Minimal interface layer to `with-overwrite`. 

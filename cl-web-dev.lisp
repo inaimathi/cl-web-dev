@@ -21,6 +21,13 @@
        (with-open-file (,stream ,fname :direction :output :if-exists :supersede :if-does-not-exist :create)
 	 ,@body))))
 
+(defmacro with-append (stream file-name &body body)
+  (with-gensyms (fname)
+    `(let ((,fname ,file-name))
+       (ensure-directories-exist ,fname)
+       (with-open-file (,stream ,fname :direction :output :if-exists :append :if-does-not-exist :create)
+	 ,@body))))
+
 (defmethod to-file ((fname string) dat) 
   (to-file (pathname fname) dat))
 
