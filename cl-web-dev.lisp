@@ -92,17 +92,35 @@
 (defpsmacro string->obj (thing)
   `(chain j-query (parse-j-s-o-n ,thing)))
 
+(defpsmacro map-markup (lst &body elem-markup)
+  `(chain (loop for elem in ,lst
+	     collect (who-ps-html ,@elem-markup))
+	  (join "")))
+
 (defpsmacro fn (&body body) `(lambda () ,@body))
 
 ;;;;;;;;;;;;;;;;;;;; jQuery Basics
 (defpsmacro $ (selector &body chains)
   `(chain (j-query ,selector) ,@chains))
 
+(defpsmacro $exists? (selector)
+    `(> (@ ($ ,selector) length) 0))
+
+(defpsmacro $val (selector)
+  (with-ps-gensyms (sel type elem txt)
+    `(let* ((,sel ,selector)
+	    (,elem ($ ,sel (get 0)))
+	    (,type (@ ,elem tag-name)))
+       (case ,type
+	 ("INPUT" (chain ,elem (val)))
+	 ("TEXTAREA" (chain ,elem (val)))
+	 (t (chain ,elem (text)))))))
+
 (defpsmacro $int (selector &optional (start 0))
-  `(parse-int (chain ($ ,selector (text)) (substring ,start))))
+  `(parse-int (chain ($val ,selector) (substring ,start))))
 
 (defpsmacro $float (selector &optional (start 0))
-  `(parse-int (chain ($ ,selector (text)) (substring ,start))))
+  `(parse-int (chain ($val ,selector) (substring ,start))))
 
 (defpsmacro doc-ready (&body body) 
   `($ document (ready (fn ,@body))))
@@ -130,23 +148,46 @@
 (defpsmacro $highlight (target)
   `($ ,target (stop t t) (effect :highlight nil 500)))
 
-(defpsmacro $droppable (target &rest class/action-list)
-  `($ ,target (droppable 
-	       (create 
-		:drop (lambda (event ui)
-			(let ((dropped (@ ui helper context)))
-			  ;; not sure if this should be a cond or a list of independent whens
-			  (cond ,@(loop for (class action) in class/action-list
-				     collect `(($ dropped (has-class ,class)) ,action)))))))))
+(defparameter mod-keys 
+  `((shift? (@ event shift-key))
+    (alt? (@ event alt-key))
+    (ctrl? (@ event ctrl-key))
+    (meta? (@ event meta-key))))
+
+(defpsmacro $droppable (target (&key overlapping) &rest class/action-list)
+  `($ ,target
+      (droppable 
+       (create 
+	:drop (lambda (event ui)
+		(let ((dropped (@ ui helper context))
+		      ,@mod-keys)
+		  (cond ,@(loop for (class action) in class/action-list
+			     collect `(($ dropped (has-class ,class)) ,action)))))
+	,@(when overlapping
+		`(:over (fn ($ ,overlapping (droppable "disable")))
+		  :out (fn ($ ,overlapping (droppable "enable")))))))))
 
 (defpsmacro $draggable (target (&key revert handle cancel) &body body)
-  `($ ,target (draggable (create :stop (lambda (event ui) ,@body)
+  `($ ,target (draggable (create :stop (lambda (event ui) 
+					 (let (,@mod-keys)
+					   ,@body))
 				 ,@(when revert `(:revert ,revert))
 				 ,@(when handle `(:handle ,handle))
 				 ,@(when cancel `(:cancel ,cancel))))))
 
-(defpsmacro $click (target &rest body)
-  `($ ,target (click (lambda (event) ,@body))))
+(defpsmacro $keypress (target &rest key/body-pairs)
+  `($ ,target
+      (keypress
+       (lambda (event)
+	 (let (,@mod-keys
+	       (<ret> 13) (<esc> 27) (<space> 32) 
+	       (<up> 38) (<down> 40) (<left> 37) (<right> 39))
+	   (cond ,@(loop for (key body) on key/body-pairs by #'cddr
+		      collect `((= (@ event which) ,(if (stringp key) `(chain ,key (char-code-at 0)) key)) ,body))))))))
+
+(defpsmacro $click (&rest target/body-list)
+  `(progn ,@(loop for (target body) on target/body-list by #'cddr
+	       collect `($ ,target (click (lambda (event) ,body))))))
 
 (defpsmacro $right-click (target &rest body)
   (with-gensyms (fn)

@@ -15,8 +15,8 @@
    #:html #:html-str #:html-prologue #:scripts #:styles #:htm #:fmt #:str
 
    ;; parenscript interaction (the cl-web-dev includer will still need parenscript)
-   #:obj->string #:string->obj #:fn #:log #:*debugging?*
-   #:$ #:$int #:$float #:$click #:$right-click
+   #:obj->string #:string->obj #:fn #:$exists? #:map-markup #:log #:*debugging?*
+   #:$ #:$val #:$int #:$float #:$click #:$right-click #:$keypress
    #:doc-ready #:$map #:$grep #:$highlight 
    #:$get #:$post #:$droppable #:$draggable))
 

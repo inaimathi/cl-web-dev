@@ -11,6 +11,16 @@ A collection of functions and macros I've found useful while doing web developme
 - Platform Independent. It uses [cl-who](http://weitz.de/cl-who/), [hunchentoot](http://weitz.de/hunchentoot/) and [parenscript](http://common-lisp.net/project/parenscript/), and isn't built to support anything else.
 - A way to avoid learning `cl-who`, `parenscript` or `hunchentoot`. It lets you use each of them a bit more easily, but that's all.
 
+### Latest Changes
+
+- Added `map-markup`; a function to make it easier to generate markup with `who-ps-html`
+- Added `$val`, a macro that returns the targets `.text()` or `.val()` depending on context
+- Added `$keypress`; a macro to make it easier to designate keyboard events
+- Added `$exists?` because I got sick of having to remember the trick to get this behavior out of jQuery (You need to check the length of the return array when running a selector).
+- `$int` and `$float` now use `$val` internally, so they can handle all kinds of elements rather than just `div`s and `span`s
+- `$droppable` now has the option to disable other droppables by selector to prevent overlap
+- `$draggable` and `$droppable` now have `shift?`, `alt?`, `ctrl?` and `meta?` bound to the appropriate key boolean.
+ 
 # Usage
 
 You just need to `:use` the packages `:cl-web-dev` and `:parenscript` in whatever project you'd like. Load the others mentioned, but `:cl-web-dev` re-exports all the relevant symbols from `:cl-who` and `:hunchentoot`, so you don't need to worry about those. 
@@ -111,6 +121,10 @@ Takes a JSON object and stringifies it.
 
 Takes a string and tries to parse it into a JSON object.
 
+#### map-markup
+
+Takes a list, and som element markup. Collects the results of applying the markup to each element of list. Automatically applies `join` to avoid commas in modern browsers.
+
 #### fn
 
 Shorthand for the anonymous function of zero arguments.
@@ -122,6 +136,14 @@ Shorthand for `(chain console (log ...))`. A related symbol is `*debugging?*`; i
 #### $
 
 Basic emulation of the jQuery selector. It doesn't do standalone jQuery functions. For instance, it won't do what you think if you try `($ (map (list 1 2 3) (lambda (a) (+ 1 a))))`. But it will do what you think if you try `($ "#test" (val))`.
+
+#### $exists?
+
+Macro that formalizes an `exists?` check for jQuery elements. Takes a selector, returns true if any elements matching the selector exist.
+
+#### $val
+
+Takes a selector. Returns either the result of calling `.text()` or `.val()` on the selected element as appropriate.
 
 #### $int
 
@@ -177,11 +199,11 @@ Interface to `.droppable`.
 
 Example:
 
-    ($droppable board-selector
+    ($droppable board-selector (:overlapping ".foo")
 	(:card-in-hand 
 	 (play ($ dropped (attr :id)) :up (@ event client-x) (@ event client-y) 0 0)))
 
-This will run the code `(play ...` when a `draggable` with the class `card-in-hand` is dropped on it.
+This will run the code `(play ...` when a `draggable` with the class `card-in-hand` is dropped on it. When the draggable is entered, all draggables with class `foo` will be temporarily disabled until this draggable is exited.
 
 #### $draggable
 
@@ -193,3 +215,15 @@ Example:
 	(move (self id) (@ ui offset left) (@ ui offset top) 0 0))
 
 This creates a draggable for the class `.foo`, and runs `(move...` when dragging stops.
+
+#### $keypress
+
+Interface to `.keypress()`. Binds the symbols `shift?`, `alt?`, `ctrl?` and `meta?` to the appropriate modifier key check. Binds the symbols `<ret>`, `<esc>`, `<space>`, `<up>`, `<down>`, `<left>` and `<right>` to the appropriate key codes. Accepts single-letter strings instead of keycodes for the other keys.
+
+#### $click
+
+Interface to `.click()`. It takes a list of `selector/body`. It runs the body when a thing of the appropriate selector is clicked.
+
+#### $right-click
+
+Takes a selector and a body. Runs body whenever the selected element is right-clicked.
