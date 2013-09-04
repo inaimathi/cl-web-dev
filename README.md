@@ -216,7 +216,7 @@ Example:
 
 This creates a draggable for the class `.foo`, and runs `(move...` when dragging stops.
 
-#### keydown
+#### $keydown
 
 Interface to `.keydown()`. Binds the symbols `shift?`, `alt?`, `ctrl?` and `meta?` to the appropriate modifier key check. Binds the symbols `<ret>`, `<esc>`, `<space>`, `<up>`, `<down>`, `<left>` and `<right>` to the appropriate key codes. Accepts single-letter strings instead of keycodes for the other keys.
 
