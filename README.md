@@ -13,9 +13,9 @@ A collection of functions and macros I've found useful while doing web developme
 
 ### Latest Changes
 
+- Changed `$keypress` to `$keydown`
 - Added `map-markup`; a function to make it easier to generate markup with `who-ps-html`
 - Added `$val`, a macro that returns the targets `.text()` or `.val()` depending on context
-- Added `$keypress`; a macro to make it easier to designate keyboard events
 - Added `$exists?` because I got sick of having to remember the trick to get this behavior out of jQuery (You need to check the length of the return array when running a selector).
 - `$int` and `$float` now use `$val` internally, so they can handle all kinds of elements rather than just `div`s and `span`s
 - `$droppable` now has the option to disable other droppables by selector to prevent overlap
@@ -216,9 +216,9 @@ Example:
 
 This creates a draggable for the class `.foo`, and runs `(move...` when dragging stops.
 
-#### $keypress
+#### keydown
 
-Interface to `.keypress()`. Binds the symbols `shift?`, `alt?`, `ctrl?` and `meta?` to the appropriate modifier key check. Binds the symbols `<ret>`, `<esc>`, `<space>`, `<up>`, `<down>`, `<left>` and `<right>` to the appropriate key codes. Accepts single-letter strings instead of keycodes for the other keys.
+Interface to `.keydown()`. Binds the symbols `shift?`, `alt?`, `ctrl?` and `meta?` to the appropriate modifier key check. Binds the symbols `<ret>`, `<esc>`, `<space>`, `<up>`, `<down>`, `<left>` and `<right>` to the appropriate key codes. Accepts single-letter strings instead of keycodes for the other keys.
 
 #### $click
 

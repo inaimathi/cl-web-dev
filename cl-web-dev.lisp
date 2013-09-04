@@ -175,15 +175,16 @@
 				 ,@(when handle `(:handle ,handle))
 				 ,@(when cancel `(:cancel ,cancel))))))
 
-(defpsmacro $keypress (target &rest key/body-pairs)
+(defpsmacro $keydown (target &rest key/body-pairs)
   `($ ,target
       (keypress
        (lambda (event)
 	 (let (,@mod-keys
 	       (<ret> 13) (<esc> 27) (<space> 32) 
-	       (<up> 38) (<down> 40) (<left> 37) (<right> 39))
+	       (<up> 38) (<down> 40) (<left> 37) (<right> 39)
+	       (key-code (or (@ event key-code) (@ event which))))
 	   (cond ,@(loop for (key body) on key/body-pairs by #'cddr
-		      collect `((= (@ event which) ,(if (stringp key) `(chain ,key (char-code-at 0)) key)) ,body))))))))
+		      collect `((= key-code ,(if (stringp key) `(chain ,key (char-code-at 0)) key)) ,body))))))))
 
 (defpsmacro $click (&rest target/body-list)
   `(progn ,@(loop for (target body) on target/body-list by #'cddr
