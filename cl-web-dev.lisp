@@ -162,7 +162,8 @@
 		(let ((dropped (@ ui helper context))
 		      ,@mod-keys)
 		  (cond ,@(loop for (class action) in class/action-list
-			     collect `(($ dropped (has-class ,class)) ,action)))))
+			     collect `(($ dropped (has-class ,class)) ,action)))
+		  ($ ,overlapping (droppable "enable"))))
 	,@(when overlapping
 		`(:over (fn ($ ,overlapping (droppable "disable")))
 		  :out (fn ($ ,overlapping (droppable "enable")))))))))
@@ -186,6 +187,17 @@
 	   (cond ,@(loop for (key body) on key/body-pairs by #'cddr
 		      collect `((= key-code ,(if (stringp key) `(chain ,key (char-code-at 0)) key)) ,body))))))))
 
+(defpsmacro $on (context-selector &rest event/selector/behavior-list)
+  `($ ,context-selector
+      ,@(loop for (ev sel . behav) in event/selector/behavior-list
+	   collect `(on ,ev ,sel (lambda (event) ,@behav)))))
+
+(defpsmacro $button (selector (icon-name &key text? class) &body on-click)
+  `($ ,selector
+      (button (create :icons (create :primary ,(format nil "ui-icon-~(~a~)" icon-name)) :text ,(when text? t)))
+      (click (lambda (event) ,@on-click))
+      ,@(when class `((add-class ,class)))))
+
 (defpsmacro $click (&rest target/body-list)
   `(progn ,@(loop for (target body) on target/body-list by #'cddr
 	       collect `($ ,target (click (lambda (event) ,body))))))
@@ -202,6 +214,15 @@
 		(lambda (event)
 		  (,fn event)
 		  (setf (@ window event return-value) false)))))))
+
+(defpsmacro $append (target &rest html)
+  `($ ,target (append (who-ps-html ,@html))))
+
+(defpsmacro $prepend (target &rest html)
+  `($ ,target (prepend (who-ps-html ,@html))))
+
+(defpsmacro $replace (target &rest html)
+  `($ ,target (append (who-ps-html ,@html))))
 
 (defpsmacro event-source (uri &body name/body-list)
   (with-gensyms (stream handlers ev)

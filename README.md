@@ -13,13 +13,12 @@ A collection of functions and macros I've found useful while doing web developme
 
 ### Latest Changes
 
+- Added `$on` and `$button` macros
+- Added `$append`, `$prepend` and `$replace` macros
 - Changed `$keypress` to `$keydown`
 - Added `map-markup`; a function to make it easier to generate markup with `who-ps-html`
 - Added `$val`, a macro that returns the targets `.text()` or `.val()` depending on context
 - Added `$exists?` because I got sick of having to remember the trick to get this behavior out of jQuery (You need to check the length of the return array when running a selector).
-- `$int` and `$float` now use `$val` internally, so they can handle all kinds of elements rather than just `div`s and `span`s
-- `$droppable` now has the option to disable other droppables by selector to prevent overlap
-- `$draggable` and `$droppable` now have `shift?`, `alt?`, `ctrl?` and `meta?` bound to the appropriate key boolean.
  
 # Usage
 
@@ -141,21 +140,30 @@ Basic emulation of the jQuery selector. It doesn't do standalone jQuery function
 
 Macro that formalizes an `exists?` check for jQuery elements. Takes a selector, returns true if any elements matching the selector exist.
 
+Example:
+
+      (if ($exists? sel)
+          ($ sel (replace (render-table-entry (@ ev table))))
+          (render-table-entry (@ ev table)))
+
+
 #### $val
 
-Takes a selector. Returns either the result of calling `.text()` or `.val()` on the selected element as appropriate.
+Takes a selector. Returns either the result of calling `.text()` or `.val()` on the selected element as appropriate. It's not really common to use it directly, but if you wanted to, you could
 
-#### $int
+      ($val "#foo")
 
-Tries to parse the value of the target element as an integer.
+#### $int/$float
 
-#### $float
+Tries to parse the value of the target element as an integer or float, depending on which one you call.
 
-Tries to parse the value of the target element as a float.
+Example:
+
+      ($ trg (text (min 4096 (+ 1 ($int trg)))))
 
 #### doc-ready
 
-Shorthand for `($ document (ready (lambda () ...)))`.
+Shorthand for `($ document (ready (lambda () ...)))`. You'd use it by doing `(doc-ready ...)`.
 
 #### $map
 
@@ -165,33 +173,45 @@ Example:
 
     ($map (list 3 2 1) (list i elem))
     
-will return `[[0 3] [1 2] [2 1]]`
+will return `[[0 3] [1 2] [2 1]]`. I've found that in most places, it's about as easy to use `loop`.
 
 #### $grep
 
 Interface to the jQuery `$.grep`. Takes a body rather than a function just like `$map`.
 
-#### $get
+#### $get/$post
 
-Interface to the `$.get` function. Takes a `uri`, an object of parameters and a `body`. There are four bound symbols in body:
-
-- `data`, which refers to the raw return from the handler (doesn't seem to work in all browsers)
-- `status` the HTTP response code
-- `jqXHR`, the jquery response JSON object
-- `res`, a parsed JSON object of the response text when possible
-
-#### $post
-
-Interface to the `$.post` function. Takes a `uri`, an object of parameters and a `body`. There are four bound symbols in body:
+Interface to the `$.get` and `$post` functions. Takes a `uri`, an object of parameters and a `body`. There are four bound symbols in body:
 
 - `data`, which refers to the raw return from the handler (doesn't seem to work in all browsers)
 - `status` the HTTP response code
 - `jqXHR`, the jquery response JSON object
 - `res`, a parsed JSON object of the response text when possible
+
+I tend not to use these directly, instead defining higher level constructs to do ajax calls for me, but if I did, it would look something like
+
+      ($post "/target/page (:foo 1 :bar 2) 
+             (log res))
 
 #### $highlight
 
-Shorthand for `($ "#foo" (stop t t) (effect :highlight nil 500))`.
+Shorthand for `($ "#foo" (stop t t) (effect :highlight nil 500))`. 
+
+Example:
+    ($highlight "#card")
+
+#### $append/$prepend/$replace
+
+They're similar enough that I'll cover them all together. They each take a target and some `cl-who` markup, and do the appropriate thing. Example of use:
+
+      ($prepend "#decks-tab" (:div :class "new-deck new-custom-deck" 
+				   :title deck-name deck-name))
+				   
+The other two have the same argument signatures, and only slight differences in behavior;
+
+ - `$prepend` replaces the target with the specified markup
+ - `$append` adds the specified markup to the end of the target
+ - `$prepend` adds the specified markup to the beginning of the target
 
 #### $droppable
 
@@ -220,10 +240,38 @@ This creates a draggable for the class `.foo`, and runs `(move...` when dragging
 
 Interface to `.keydown()`. Binds the symbols `shift?`, `alt?`, `ctrl?` and `meta?` to the appropriate modifier key check. Binds the symbols `<ret>`, `<esc>`, `<space>`, `<up>`, `<down>`, `<left>` and `<right>` to the appropriate key codes. Accepts single-letter strings instead of keycodes for the other keys.
 
-#### $click
+Example:
+
+      ($keydown "#new-table-setup .game-tag" 
+		<ret> ($ "#new-table-setup .ok" (click))
+		<esc> ($ "#new-table-setup .cancel" (click)))
+
+#### $on
+
+Interface to `.on()`, but only deals with the delegation situation. 
+
+Example:
+
+     ($on "#deck-editor"
+	  (:click "button.remove" ($ this (parent) (remove)))
+	  (:click "button.add" ($ "#deck-editor .cards" (append ($ this (parent) (clone))))))
+
+#### $button
+
+Interface to `.button()`, and optionally also defines a `.click()` event as well. Example use:
+
+      ($button "#zoomed-card button.hide" (:zoomout) ($ "#zoomed-card" (hide)))
+      
+if you want to create a button with no click event, just omit that last part.
+
+      ($button "#zoomed-card button.hide" (:zoomout))
+
+#### $click/$right-click
 
 Interface to `.click()`. It takes a list of `selector/body`. It runs the body when a thing of the appropriate selector is clicked.
 
-#### $right-click
+Example:
 
-Takes a selector and a body. Runs body whenever the selected element is right-clicked.
+      ($click "#game .join" (lobby/join-table id ""))
+
+The `$right-click` macro is called exactly the same way, but I should note that I've stopped using it.
