@@ -198,7 +198,8 @@ I tend not to use these directly, instead defining higher level constructs to do
 Shorthand for `($ "#foo" (stop t t) (effect :highlight nil 500))`. 
 
 Example:
-    ($highlight "#card")
+
+      ($highlight "#card")
 
 #### $append/$prepend/$replace
 
