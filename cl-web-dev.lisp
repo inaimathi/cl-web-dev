@@ -145,6 +145,22 @@
 		  (let ((res (string->obj (@ jqXHR response-text))))
 		    ,@body)))))
 
+(defpsmacro $upload (target-form uri &rest success)
+  (with-ps-gensyms (form-data)
+    `(let ((,form-data (new (-form-data (aref ($ ,target-form) 0)))))
+       (chain j-query
+	      (ajax (create :url ,uri
+			    :type "POST"
+			    :success (lambda (data status jqXHR)
+				       (let ((res (string->obj (@ jqXHR response-text))))
+					 ,@success))
+			    :error (lambda (jqXHR status error-thrown)
+				     (log "UPLOAD ERRORED" jqXHR status error-thrown))
+			    :data ,form-data
+			    :cache false
+			    "contentType" false
+			    "processData" false))))))
+
 (defpsmacro $highlight (target)
   `($ ,target (stop t t) (effect :highlight nil 500)))
 
@@ -153,6 +169,10 @@
     (alt? (@ event alt-key))
     (ctrl? (@ event ctrl-key))
     (meta? (@ event meta-key))))
+
+(defparameter key-codes
+  `((<ret> 13) (<esc> 27) (<space> 32) 
+    (<up> 38) (<down> 40) (<left> 37) (<right> 39)))
 
 (defpsmacro $droppable (target (&key overlapping) &rest class/action-list)
   `($ ,target
@@ -181,8 +201,7 @@
       (keypress
        (lambda (event)
 	 (let (,@mod-keys
-	       (<ret> 13) (<esc> 27) (<space> 32) 
-	       (<up> 38) (<down> 40) (<left> 37) (<right> 39)
+	       ,@key-codes
 	       (key-code (or (@ event key-code) (@ event which))))
 	   (cond ,@(loop for (key body) on key/body-pairs by #'cddr
 		      collect `((= key-code ,(if (stringp key) `(chain ,key (char-code-at 0)) key)) ,body))))))))
@@ -190,7 +209,14 @@
 (defpsmacro $on (context-selector &rest event/selector/behavior-list)
   `($ ,context-selector
       ,@(loop for (ev sel . behav) in event/selector/behavior-list
-	   collect `(on ,ev ,sel (lambda (event) ,@behav)))))
+	   collect 
+	     `(on ,ev ,sel (lambda (event) 
+			     ,@(if (eq ev :keydown)
+				   `((let (,@mod-keys ,@key-codes
+					   (key-code (or (@ event key-code) (@ event which))))
+				       (cond ,@(loop for (key body) on behav by #'cddr
+						  collect `((= key-code ,(if (stringp key) `(chain ,key (char-code-at 0)) key)) ,body)))))
+				   behav))))))
 
 (defpsmacro $button (selector (icon-name &key text? class) &body on-click)
   `($ ,selector

@@ -13,6 +13,7 @@ A collection of functions and macros I've found useful while doing web developme
 
 ### Latest Changes
 
+- Added `$upload` macro
 - Added `$on` and `$button` macros
 - Added `$append`, `$prepend` and `$replace` macros
 - Changed `$keypress` to `$keydown`
@@ -192,6 +193,21 @@ I tend not to use these directly, instead defining higher level constructs to do
 
       ($post "/target/page (:foo 1 :bar 2) 
              (log res))
+
+#### $upload
+
+A way to do async uploads as of HTML5. It expects you to pass it a form rather than a file, which is why you can't do this using a vanilla `$post` call, but it's still a damn sight easier than async uploads used to be.
+
+Example:
+
+      ;; somewhere in the HTML
+      (:form :id "load-deck-form" :enctype "multipart/form-data"
+             (:span :class "label" "Load: ") (:input :name "deck" :type "file"))
+	     
+      ;; then in the JS
+      ($ "#load-deck-form" 
+         (change (fn ($upload "#load-deck-form" "/load-deck"
+                              (load-deck-for-editing res)))))
 
 #### $highlight
 

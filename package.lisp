@@ -19,5 +19,5 @@
    #:$ #:$val #:$int #:$float #:$on #:$button #:$click #:$right-click #:$keydown
    #:$append #:$prepend #:$replace
    #:doc-ready #:$map #:$grep #:$highlight 
-   #:$get #:$post #:$droppable #:$draggable))
+   #:$get #:$post #:$upload #:$droppable #:$draggable))
 
