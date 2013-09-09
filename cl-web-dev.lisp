@@ -248,7 +248,7 @@
   `($ ,target (prepend (who-ps-html ,@html))))
 
 (defpsmacro $replace (target &rest html)
-  `($ ,target (append (who-ps-html ,@html))))
+  `($ ,target (replace-with (who-ps-html ,@html))))
 
 (defpsmacro event-source (uri &body name/body-list)
   (with-gensyms (stream handlers ev)
