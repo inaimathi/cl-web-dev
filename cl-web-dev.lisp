@@ -181,8 +181,8 @@
 	:drop (lambda (event ui)
 		(let ((dropped (@ ui helper context))
 		      ,@mod-keys)
-		  (cond ,@(loop for (class action) in class/action-list
-			     collect `(($ dropped (has-class ,class)) ,action)))
+		  (cond ,@(loop for (class . action) in class/action-list
+			     collect `(($ dropped (has-class ,class)) ,@action)))
 		  ($ ,overlapping (droppable "enable"))))
 	,@(when overlapping
 		`(:over (fn ($ ,overlapping (droppable "disable")))
