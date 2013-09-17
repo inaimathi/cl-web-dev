@@ -125,8 +125,10 @@
 (defpsmacro doc-ready (&body body) 
   `($ document (ready (fn ,@body))))
 
-(defpsmacro $map (lst &body body)
-  `(chain j-query (map ,lst (lambda (elem i) ,@body))))
+(defpsmacro $map (list &body body)
+  (with-ps-gensyms (lst)
+    `(let ((,lst ,list)) 
+       (when ,lst (chain j-query (map ,lst (lambda (elem i) ,@body)))))))
 
 (defpsmacro $grep (lst &body body)
   `(chain j-query (grep ,lst (lambda (elem i) ,@body))))
