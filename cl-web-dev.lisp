@@ -107,10 +107,10 @@
     `(> (@ ($ ,selector) length) 0))
 
 (defpsmacro $val (selector)
-  (with-ps-gensyms (sel type elem txt)
+  (with-ps-gensyms (sel type elem)
     `(let* ((,sel ,selector)
-	    (,elem ($ ,sel (get 0)))
-	    (,type (@ ,elem tag-name)))
+	    (,elem ($ ,sel))
+	    (,type (chain ,elem (get 0) tag-name)))
        (case ,type
 	 ("INPUT" (chain ,elem (val)))
 	 ("TEXTAREA" (chain ,elem (val)))
