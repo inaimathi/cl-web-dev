@@ -133,6 +133,11 @@ Shorthand for the anonymous function of zero arguments.
 
 Shorthand for `(chain console (log ...))`. A related symbol is `*debugging?*`; if it's set to `nil`, a call to `log` will expand into nothing instead of the logging statement.
 
+
+#### $aif/$awhen
+
+Equivalents to `aif` and `awhen` for use in JS code. They're basically the same definition, except made with `defpsmacro` instead of `defmacro`.
+
 #### $
 
 Basic emulation of the jQuery selector. It doesn't do standalone jQuery functions. For instance, it won't do what you think if you try `($ (map (list 1 2 3) (lambda (a) (+ 1 a))))`. But it will do what you think if you try `($ "#test" (val))`.

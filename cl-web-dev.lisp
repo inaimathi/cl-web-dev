@@ -99,6 +99,13 @@
 
 (defpsmacro fn (&body body) `(lambda () ,@body))
 
+(defpsmacro $aif (test-form then-form &optional else-form)
+  `(let ((it ,test-form))
+     (if it ,then-form ,else-form)))
+
+(defpsmacro $awhen (test-form &body when-true)
+  `(aif ,test-form (progn ,@when-true)))
+
 ;;;;;;;;;;;;;;;;;;;; jQuery Basics
 (defpsmacro $ (selector &body chains)
   `(chain (j-query ,selector) ,@chains))
