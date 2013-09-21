@@ -107,10 +107,10 @@
     `(> (@ ($ ,selector) length) 0))
 
 (defpsmacro $val (selector)
-  (with-ps-gensyms (sel type elem txt)
+  (with-ps-gensyms (sel type elem)
     `(let* ((,sel ,selector)
-	    (,elem ($ ,sel (get 0)))
-	    (,type (@ ,elem tag-name)))
+	    (,elem ($ ,sel))
+	    (,type (chain ,elem (get 0) tag-name)))
        (case ,type
 	 ("INPUT" (chain ,elem (val)))
 	 ("TEXTAREA" (chain ,elem (val)))
@@ -125,8 +125,10 @@
 (defpsmacro doc-ready (&body body) 
   `($ document (ready (fn ,@body))))
 
-(defpsmacro $map (lst &body body)
-  `(chain j-query (map ,lst (lambda (elem i) ,@body))))
+(defpsmacro $map (list &body body)
+  (with-ps-gensyms (lst)
+    `(let ((,lst ,list)) 
+       (when ,lst (chain j-query (map ,lst (lambda (elem i) ,@body)))))))
 
 (defpsmacro $grep (lst &body body)
   `(chain j-query (grep ,lst (lambda (elem i) ,@body))))
@@ -181,8 +183,8 @@
 	:drop (lambda (event ui)
 		(let ((dropped (@ ui helper context))
 		      ,@mod-keys)
-		  (cond ,@(loop for (class action) in class/action-list
-			     collect `(($ dropped (has-class ,class)) ,action)))
+		  (cond ,@(loop for (class . action) in class/action-list
+			     collect `(($ dropped (has-class ,class)) ,@action)))
 		  ($ ,overlapping (droppable "enable"))))
 	,@(when overlapping
 		`(:over (fn ($ ,overlapping (droppable "disable")))
