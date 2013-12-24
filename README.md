@@ -45,20 +45,6 @@ The "Hello World" is...
 
 ## General purpose stuff
 
-These are just simple, general-purpose utilities. You can find them in [alexandria](http://common-lisp.net/project/alexandria/) and/or [anaphora](http://common-lisp.net/project/anaphora/), but the goal of `cl-web-dev` is to be self-contained.
-
-#### with-gensyms
-
-Thank you, [Peter Seibel](http://www.gigamonkeys.com/book/macros-defining-your-own.html). It's a macro used to assign multiple `gensym` bindings for defining macros.
-
-#### aif
-
-Thank you, [Paul Graham](http://dunsmor.com/lisp/onlisp/onlisp_18.html). The anaphoric `if` statement; you can use the symbol `it` in its clauses to refer to the result of the test expression.
-
-#### awhen
-
-Thank you again, Paul. The `when`-equivalent of `aif`.
-
 #### with-overwrite
 
 Basic macro that provides a particular series of default values to `with-open-file`. In particular, it ensures that the specified directories exist, automatically creates a nonexistant file, and automatically over-writes an existing one.

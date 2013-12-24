@@ -3,17 +3,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; General utility
-(defmacro with-gensyms ((&rest names) &body body)
-  `(let ,(loop for n in names collect `(,n (gensym)))
-     ,@body))
-
-(defmacro aif (test-form then-form &optional else-form)
-  `(let ((it ,test-form))
-     (if it ,then-form ,else-form)))
-
-(defmacro awhen (test-form &body then-form)
-  `(aif ,test-form (progn ,@then-form)))
-
 (defmacro with-overwrite (stream file-name &body body)
   (with-gensyms (fname)
     `(let ((,fname ,file-name))
@@ -104,7 +93,7 @@
      (if it ,then-form ,else-form)))
 
 (defpsmacro $awhen (test-form &body when-true)
-  `(aif ,test-form (progn ,@when-true)))
+  `($aif ,test-form (progn ,@when-true)))
 
 ;;;;;;;;;;;;;;;;;;;; jQuery Basics
 (defpsmacro $ (selector &body chains)

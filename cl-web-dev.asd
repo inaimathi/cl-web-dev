@@ -6,6 +6,7 @@
   :author "Your Name <your.name@example.com>"
   :license "Specify license here"
   :depends-on (#:hunchentoot
+	       #:alexandria
                #:parenscript
                #:cl-who)
   :components ((:file "package")

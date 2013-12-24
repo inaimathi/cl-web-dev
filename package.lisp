@@ -3,10 +3,11 @@
   (:use #:cl #:parenscript)
   (:import-from #:hunchentoot #:define-easy-handler #:stop
 		#:session-start #:session-value #:delete-session-value #:remove-session)
+  (:import-from #:alexandria #:with-gensyms)
   (:import-from #:cl-who #:with-html-output-to-string #:with-html-output #:htm #:fmt #:str)
   (:export
    ;; general
-   #:with-gensyms #:aif #:awhen #:with-overwrite #:with-append #:to-file
+   #:with-overwrite #:with-append #:to-file
    
    ;; hunchentoot interaction
    #:define-handler #:easy-start #:stop #:session-start #:session-value #:delete-session-value #:remove-session
